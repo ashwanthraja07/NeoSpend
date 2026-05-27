@@ -1391,9 +1391,57 @@ function renderBudget() {
 function updateBudgetInput(cat, val) {
   S.budgets[cat] = parseInt(val) || 0;
   save();
-  renderBudget();
+  // Update only the affected card's sub-elements in-place to avoid
+  // destroying the focused input (which causes keyboard to disappear)
+  _refreshBudgetCard(cat);
+  _refreshBudgetSummaryBar();
   renderCaution();
   renderBudgetBar();
+}
+
+function _refreshBudgetCard(cat) {
+  const txns  = thisMonthTxns().filter(t => t.type === 'debit');
+  const i     = S.categories.indexOf(cat);
+  if (i < 0) return;
+  const budget = S.budgets[cat] || 0;
+  const spent  = txns.filter(t => t.cat === cat).reduce((s,t)=>s+t.amt, 0);
+  const remain = budget - spent;
+  const pctC   = budget > 0 ? Math.min((spent / budget) * 100, 130) : 0;
+  const barC   = pctC > 100 ? 'var(--red)' : pctC >= 70 ? 'var(--amber)' : 'var(--green)';
+
+  // Update progress bar
+  const fill = document.getElementById('bpf-' + i);
+  if (fill) { fill.style.width = Math.min(pctC, 100) + '%'; fill.style.background = barC; }
+
+  // Update sub-text (% used / No budget set)
+  const card = document.querySelector(`.bcat-card:nth-child(${i + 1})`);
+  if (!card) return;
+  const sub = card.querySelector('.bcat-sub');
+  if (sub) sub.textContent = budget > 0 ? pctC.toFixed(0) + '% used' : 'No budget set';
+
+  // Update stat values
+  const stats = card.querySelectorAll('.bcat-stat .s-val');
+  if (stats[0]) { stats[0].textContent = budget > 0 ? fmtINR(budget) : '—'; stats[0].style.color = 'var(--muted2)'; }
+  if (stats[1]) { stats[1].textContent = fmtINR(spent); stats[1].style.color = barC; }
+  if (stats[2]) {
+    stats[2].textContent = budget > 0 ? fmtINR(Math.abs(remain)) : '—';
+    stats[2].style.color = remain >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+}
+
+function _refreshBudgetSummaryBar() {
+  const txns   = thisMonthTxns().filter(t => t.type === 'debit');
+  const totalB = S.categories.reduce((s,c) => s + (S.budgets[c]||0), 0);
+  const totalS = S.categories.reduce((s,c) => s + txns.filter(t=>t.cat===c).reduce((ss,t)=>ss+t.amt,0), 0);
+  const totalR = totalB - totalS;
+  const pct    = totalB > 0 ? Math.round((totalS/totalB)*100) : 0;
+  document.getElementById('tot-budget').textContent = fmtINR(totalB);
+  document.getElementById('tot-spent').textContent  = fmtINR(totalS);
+  document.getElementById('tot-remain').textContent = fmtINR(Math.abs(totalR));
+  document.getElementById('tot-remain').style.color = totalR >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('budget-pct-badge').textContent = pct + '% used';
+  document.getElementById('stack-spent').style.width  = Math.min(pct, 100) + '%';
+  document.getElementById('stack-remain').style.width = Math.max(0, 100 - pct) + '%';
 }
 
 // ══════════════════════════════════════════
