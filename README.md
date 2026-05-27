@@ -18,28 +18,7 @@ A fully interactive personal finance tracker built as a **Progressive Web App (P
 
 ---
 
-## 🚀 Deploy to Netlify (Recommended)
 
-### Option A — Drag & Drop (Fastest)
-1. Go to [netlify.com](https://netlify.com) → Log in → **Sites**
-2. Drag the entire `neo-spend/` folder onto the Netlify dashboard
-3. Done — you'll get a live URL like `https://neo-spend-xxxx.netlify.app`
-
-### Option B — GitHub + Netlify CI/CD
-1. **Push to GitHub:**
-   ```bash
-   cd neo-spend
-   git init
-   git add .
-   git commit -m "feat: Neo Spend PWA"
-   git remote add origin https://github.com/YOUR_USERNAME/neo-spend.git
-   git push -u origin main
-   ```
-2. Go to [app.netlify.com](https://app.netlify.com) → **Add new site** → **Import from Git**
-3. Select your repo → Build settings are auto-detected via `netlify.toml`
-4. Click **Deploy site**
-
----
 
 ## 📱 Install on iOS
 
@@ -61,34 +40,7 @@ A fully interactive personal finance tracker built as a **Progressive Web App (P
 
 ---
 
-## 🗂 Project Structure
 
-```
-neo-spend/
-├── index.html       ← Complete single-page app (HTML + CSS + JS)
-├── manifest.json    ← PWA manifest (icons, name, theme)
-├── sw.js            ← Service worker (offline caching)
-├── netlify.toml     ← Netlify headers & redirect config
-└── README.md        ← This file
-```
-
----
-
-## 🛠 Local Development
-
-```bash
-# Install a simple local server (one-time)
-npm install -g serve
-
-# Run locally
-cd neo-spend
-serve .
-# Open http://localhost:3000
-```
-
-Or use VS Code Live Server extension — right-click `index.html` → **Open with Live Server**.
-
----
 
 ## 📦 Tech Stack
 
